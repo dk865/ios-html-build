@@ -32,12 +32,13 @@ jobs:
         with:
             submodules: recursive
 
-      - name: Install Node.js and Capacitor
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-        run: |
-          npm install -g @capacitor/cli
+
+      - name: Install Capacitor
+        run: npm install -g @capacitor/cli
 
       - name: Install Dependencies
         run: npm install
