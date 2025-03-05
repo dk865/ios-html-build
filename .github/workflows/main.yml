@@ -1,32 +1,49 @@
-name: Build iOS IPA
+name: "HTML to IPA: Build and Upload"
 
 on:
   push:
     branches:
-      - main
+      - '*'
+    paths-ignore:
+      - ".gitignore"
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - ".gitignore"
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 1 *'
+    - cron: '0 0 1 4 *'
+    - cron: '0 0 30 6 *'
+    - cron: '0 0 28 9 *'
+    - cron: '0 0 27 12 *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-ios:
-    runs-on: macos-latest
+  build:
+    runs-on: macos-13
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+            submodules: recursive
 
-      - name: Install Node.js
+      - name: Install Node.js and Capacitor
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Web App
-        run: npm run build
-
-      - name: Install Capacitor & iOS Platform
         run: |
           npm install -g @capacitor/cli
-          npx cap sync ios
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Copy Web Files to iOS
+        run: npx cap copy ios
 
       - name: Build iOS App
         run: |
@@ -34,8 +51,19 @@ jobs:
           xcodebuild -scheme App -archivePath output.xcarchive archive
           xcodebuild -exportArchive -archivePath output.xcarchive -exportPath output -exportOptionsPlist ExportOptions.plist
 
+      - name: Set Environment Variables
+        run: |
+          set -x
+          T2=$(TZ=UTC-2 date +'%Y%m%d_%H%M%S')
+          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
+          SHASH=$(git rev-parse --short HEAD)
+          echo "ctime=${T2}" >> $GITHUB_ENV
+          echo "ctimestamp=${TS}" >> $GITHUB_ENV
+          echo "shorthash=${SHASH}" >> $GITHUB_ENV
+
       - name: Upload IPA
+        id: html-to-ipa-upload
         uses: actions/upload-artifact@v4
         with:
-          name: MyApp.ipa
+          name: HTMLApp.ipa
           path: ios/App/output/*.ipa
