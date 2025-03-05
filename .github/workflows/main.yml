@@ -30,7 +30,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-            submodules: recursive
+          submodules: recursive
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -46,10 +46,15 @@ jobs:
       - name: Copy Web Files to iOS
         run: npx cap copy ios
 
+      - name: Install CocoaPods Dependencies
+        run: |
+          cd ios/App
+          pod install
+
       - name: Build iOS App
         run: |
           cd ios/App
-          xcodebuild -scheme App -archivePath output.xcarchive archive
+          xcodebuild -scheme App -archivePath output.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
           xcodebuild -exportArchive -archivePath output.xcarchive -exportPath output -exportOptionsPlist ExportOptions.plist
 
       - name: Set Environment Variables
