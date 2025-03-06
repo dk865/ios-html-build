@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Capacitor
+      - name: Install Capacitor CLI
         run: npm install -g @capacitor/cli
 
       - name: Install Dependencies
@@ -54,7 +54,7 @@ jobs:
       - name: Build iOS App
         run: |
           cd ios/App
-          xcodebuild -scheme App -archivePath output.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          xcodebuild -workspace App.xcworkspace -scheme App -archivePath output.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
           xcodebuild -exportArchive -archivePath output.xcarchive -exportPath output -exportOptionsPlist ExportOptions.plist
 
       - name: Set Environment Variables
