@@ -1604,6 +1604,13 @@ self.C3_ExpressionFuncs = [
 			const f3 = p._GetNode(3).GetBoundMethod();
 			return () => n0.ExpObject(n1.ExpInstVar(), (f2(f3()) - 1));
 		},
+		p => {
+			const f0 = p._GetNode(0).GetBoundMethod();
+			const n1 = p._GetNode(1);
+			return () => subtract(f0(), n1.ExpObject("lastplay"));
+		},
+		() => 86400000,
+		() => "lastplay",
 		() => "nosave",
 		() => -25,
 		() => "Music",
@@ -1662,11 +1669,10 @@ self.C3_ExpressionFuncs = [
 			const v1 = p._GetNode(1).GetVar();
 			return () => and("CPS: ", Math.ceil((v0.GetValue() + v1.GetValue())));
 		},
+		() => "multiplier",
 		() => "onecps",
 		() => "coins",
 		() => "cps",
-		() => "20",
-		() => "20,20",
 		() => 500,
 		() => "Layer 0",
 		p => {
@@ -1697,7 +1703,7 @@ self.C3_ExpressionFuncs = [
 			const v0 = p._GetNode(0).GetVar();
 			const v1 = p._GetNode(1).GetVar();
 			const v2 = p._GetNode(2).GetVar();
-			return () => and((and((and("Time Left: ", v0.GetValue()) + " Coins: "), v1.GetValue()) + " Multiplier: "), v2.GetValue());
+			return () => and((and((and("Time Left:", v0.GetValue()) + " Coins:"), v1.GetValue()) + " Multiplier:"), v2.GetValue());
 		},
 		() => "TIME'S UP!",
 		p => {
