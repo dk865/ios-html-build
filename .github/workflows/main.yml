@@ -51,24 +51,25 @@ jobs:
           cd ios/App
           pod install
 
-      - name: Build iOS App Archive
+      - name: Build iOS App Archive (Target iOS 13+)
         run: |
           cd ios/App
-          # Build an archive with signing disabled
-          xcodebuild -workspace App.xcworkspace -scheme App -archivePath output.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          xcodebuild -workspace App.xcworkspace -scheme App -archivePath output.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO -destination "generic/platform=iOS"
 
-      - name: Package Unsigned IPA
+      - name: Package Unsigned IPA (Rename to pcfire.app and pcfire.ipa)
         run: |
           # Navigate to the directory containing the built .app bundle.
           cd ios/App/output.xcarchive/Products/Applications
-          # Create a Payload folder and copy the app bundle into it.
+          # Rename the .app bundle
+          mv App.app pcfire.app
+          # Create a Payload folder and move the renamed app into it.
           mkdir Payload
-          cp -R App.app Payload/
+          mv pcfire.app Payload/
           # Zip the Payload folder into an IPA file.
-          zip -r HTMLApp.ipa Payload
+          zip -r pcfire.ipa Payload
           # Move the IPA to a known location for later upload.
-          mv HTMLApp.ipa ../../..
-          
+          mv pcfire.ipa ../../..
+
       - name: Set Environment Variables
         run: |
           set -x
@@ -83,5 +84,5 @@ jobs:
         id: html-to-ipa-upload
         uses: actions/upload-artifact@v4
         with:
-          name: HTMLApp.ipa
-          path: ios/App/HTMLApp.ipa
+          name: pcfire.ipa
+          path: ios/App/pcfire.ipa
